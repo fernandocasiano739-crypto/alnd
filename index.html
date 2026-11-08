@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+*{box-sizing:border-box;font-family:sans-serif;margin:0;padding:0}
+body{background:#070b1a;color:white;padding:22px}
+.titulo{font-size:36px;color:#3399ff;text-align:center;font-weight:bold;margin-bottom:24px}
+.caixa{background:#0e1532;border-radius:18px;padding:26px;border:1px solid #2462eb}
+.botao{width:100%;padding:15px;margin:9px 0;border:none;border-radius:12px;background:#2462eb;color:white;font-size:17px;cursor:pointer}
+.botao.redondo{width:70px;height:70px;border-radius:50%;background:#06b6d4;margin:12px auto;display:block;font-size:14px}
+.botao.ff{background:#16a34a}
+.botao.otimizar{background:#f59e0b}
+.botao:disabled{background:#374151;cursor:not-allowed;opacity:0.6}
+input, select{width:100%;padding:13px;border-radius:10px;border:none;margin:11px 0}
+#resultado{margin-top:22px;padding:17px;background:#091023;border-radius:12px;white-space:pre-line}
+</style>
+</head>
+<body>
+<div class="titulo">GERADOR SENSI AZUL</div>
+<div class="caixa">
+  <p>1. Sistema Operacional</p>
+  <select id="sistema">
+    <option value="Android">Android</option>
+    <option value="iOS">iPhone</option>
+  </select>
+
+  <p>2. Digite a marca do seu aparelho</p>
+  <input type="text" id="marcaInput" placeholder="Ex: Samsung, iPhone, Redmi">
+
+  <p>3. Digite o modelo</p>
+  <input type="text" id="modeloInput" placeholder="Ex: A05s, 18 Pro Max">
+
+  <p>4. Nível de sensibilidade</p>
+  <select id="nivelSensi">
+    <option value="alta">Alta (até 180)</option>
+    <option value="baixa">Baixa (em torno de 120)</option>
+  </select>
+
+  <p>🔒 Travar botão de geração</p>
+  <input type="checkbox" id="travarBotao">
+
+  <button class="botao" id="botaoGerar" onclick="gerarConfiguracao()">GERAR SENSIBILIDADE</button>
+  <button class="botao redondo" id="botaoRedondo" onclick="gerarConfiguracao()">GERAR</button>
+  <button class="botao" onclick="document.getElementById('resultado').innerText = guiaTravar60FPS('intermediario')">GUIA TRAVAR 60FPS</button>
+  <button class="botao" onclick="document.getElementById('resultado').innerText = otimizacaoGeral()">OTIMIZAÇÃO GERAL</button>
+  <button class="botao otimizar" onclick="ativarOtimizacao()">ATIVAR OTIMIZAÇÃO</button>
+  <button class="botao ff" onclick="abrirFreeFire()">ABRIR FREE FIRE</button>
+
+  <div id="resultado"></div>
+</div>
+
+<script>
+// Variável para controle de trava
+const checkboxTrava = document.getElementById('travarBotao');
+const botaoGerar = document.getElementById('botaoGerar');
+const botaoRedondo = document.getElementById('botaoRedondo');
+
+// Função de trava dos botões
+checkboxTrava.addEventListener('change', () => {
+  const estado = checkboxTrava.checked;
+  botaoGerar.disabled = estado;
+  botaoRedondo.disabled = estado;
+})
+
+function gerarSensibilidadeUnica(marca, modelo, sistema, nivel){
+  const seed = marca.length + modelo.length + modelo.charCodeAt(0)
+  const multiplicadorSistema = sistema === "Android" ? 1 : 0.85
+  let multiplicadorNivel
+  if(nivel === "alta"){
+    multiplicadorNivel = 1.5
+  }else{
+    multiplicadorNivel = 1
+  }
+
+  return {
+    geral: Math.min(nivel === "alta" ? 180 : 120, Math.round((80 + seed * 1.1) * multiplicadorSistema * multiplicadorNivel)),
+    pontoVermelho: Math.min(nivel === "alta" ? 180 : 120, Math.round((75 + seed * 1.05) * multiplicadorSistema * multiplicadorNivel)),
+    mira2x: Math.min(nivel === "alta" ? 180 : 120, Math.round((68 + seed * 0.95) * multiplicadorSistema * multiplicadorNivel)),
+    mira4x: Math.min(nivel === "alta" ? 180 : 120, Math.round((55 + seed * 0.8) * multiplicadorSistema * multiplicadorNivel)),
+    sniper: Math.min(nivel === "alta" ? 180 : 120, Math.round((30 + seed * 0.5) * multiplicadorSistema * multiplicadorNivel)),
+    cameraLivre: Math.min(nivel === "alta" ? 180 : 120, Math.round((60 + seed * 0.9) * multiplicadorSistema * multiplicadorNivel)),
+    dpi: sistema === "Android" ? 380 + (seed * 8) : 390
+  }
+}
+
+function guiaTravar60FPS(categoriaCelular){
+  const guias = {
+    fraco: `✅ GUIA TRAVAR 60FPS PARA CELULAR FRACO
+1. No Free Fire: Gráficos = Suave, FPS = Alto(60), desliga sombras
+2. Fecha todos apps em segundo plano antes de abrir o jogo
+3. Limpa cache do Free Fire nas configurações do app
+4. Ativa modo jogo / modo desempenho nas configurações do celular`,
+    intermediario: `✅ GUIA TRAVAR 60FPS PARA CELULAR INTERMEDIÁRIO
+1. No Free Fire: Gráficos = Suave, FPS = Alto(60), efeitos baixos
+2. Reduz animações no modo desenvolvedor para 0.5x
+3. Desativa atualizações automáticas enquanto joga
+4. Usa um dissipador de calor para evitar queda de FPS por superaquecimento`,
+    top: `✅ GUIA TRAVAR 60FPS PARA CELULAR TOP
+1. No Free Fire: Gráficos = Balanceado, FPS = Alto(60)
+2. Ativa modo desempenho máximo do fabricante
+3. Mantém espaço livre de armazenamento acima de 20%
+4. Conecta em rede Wi‑Fi estável para evitar travamentos de conexão`
+  }
+  return guias[categoriaCelular]
+}
+
+function otimizacaoGeral(){
+  return `🚀 OTIMIZAÇÃO GERAL PARA MAIS DESEMPENHO
+• Libera memória RAM fechando aplicativos em segundo plano
+• Limpa arquivos temporários e cache
+• Desativa notificações durante a partida
+• Coloca brilho em nível médio para reduzir consumo de bateria
+• Evita jogar com o celular carregando se ele esquentar muito`
+}
+
+function gerarConfiguracao(){
+  const sistema = document.getElementById('sistema').value
+  const marca = document.getElementById('marcaInput').value.trim()
+  const modelo = document.getElementById('modeloInput').value.trim()
+  const nivel = document.getElementById('nivelSensi').value
+  if(!marca || !modelo){
+    document.getElementById('resultado').innerText = "⚠️ Digite a marca e o modelo do seu aparelho!"
+    return
+  }
+  const config = gerarSensibilidadeUnica(marca, modelo, sistema, nivel)
+  document.getElementById('resultado').innerText = `📱 ${sistema} | ${marca} ${modelo}
+🔹 Nível: ${nivel === "alta" ? "Sensibilidade Alta (limite 180)" : "Sensibilidade Baixa (limite 120)"}
+🔹 Sensibilidade Geral: ${config.geral}
+🔹 Ponto Vermelho: ${config.pontoVermelho}
+🔹 Mira 2x: ${config.mira2x}
+🔹 Mira 4x: ${config.mira4x}
+🔹 Mira Sniper: ${config.sniper}
+🔹 Câmera Livre: ${config.cameraLivre}
+🔹 DPI Recomendado: ${config.dpi}
+
+💡 Ajuste 3 pontos por vez no campo de treino`
+}
+
+function abrirFreeFire(){
+  window.location.href = "intent://com.dts.freefireth#Intent;package=com.dts.freefireth;scheme=ff;end"
+}
+
+function ativarOtimizacao(){
+  document.getElementById('resultado').innerText = "✅ OTIMIZAÇÃO ATIVADA\n✅ Fechando apps em segundo plano\n✅ Reduzindo consumo de memória\n✅ Pronto para jogar com mais desempenho"
+}
+</script>
+</body>
+</html>
+<button id="btnPuxadaCapa" style="padding:12px; background:#2563eb; color:white; border:none; border-radius:8px; margin:10px 0;">Ativar ajuste de puxada de capa</button>
+<div id="bolinhaIndicador" style="position:fixed; bottom:120px; right:20px; width:55px; height:55px; background:#2563eb; border-radius:50%; display:none; box-shadow: 0 0 12px #2563eb; z-index:999;"></div>
+
+<script>
+const botao = document.getElementById('btnPuxadaCapa');
+const bolinha = document.getElementById('bolinhaIndicador');
+let ajusteAtivo = false;
+
+botao.addEventListener('click', () => {
+  ajusteAtivo = !ajusteAtivo;
+  if (ajusteAtivo) {
+    bolinha.style.display = 'block';
+    botao.textContent = 'Desativar ajuste de puxada de capa';
+    alert('Ajuste de puxada de capa ativado, use esses valores no Free Fire para melhorar o recuo: sensibilidade da câmera 95, mira 2x 88, mira 4x 82');
+  } else {
+    bolinha.style.display = 'none';
+    botao.textContent = 'Ativar ajuste de puxada de capa';
+  }
+})
+</script>
