@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerador ALND FF</title>
+<title>ALND Gerador FF</title>
 <style>
 *{box-sizing:border-box;font-family:sans-serif;margin:0;padding:0}
 body{background:linear-gradient(135deg,#050a30,#0f1742);color:white;padding:24px;min-height:100vh}
@@ -16,53 +16,78 @@ body{background:linear-gradient(135deg,#050a30,#0f1742);color:white;padding:24px
 input, select{width:100%;padding:14px;border-radius:12px;border:none;margin:8px 0 18px;color:#111;font-size:15px}
 #resultado{margin-top:24px;padding:18px;background:rgba(30,64,175,0.35);border-radius:14px;border:1px solid #3b82f6}
 
+/* Tela de login com chave */
+#telaChave{position:fixed;inset:0;background:#050a30;display:flex;align-items:center;justify-content:center;padding:20px;z-index:1000}
+.caixaChave{background:rgba(15,23,60,0.9);border:1px solid #2563eb;border-radius:20px;padding:30px;width:100%;max-width:420px;text-align:center}
+
 /* Bolinha flutuante grande */
 #bolinhaFF{position:fixed;bottom:110px;right:22px;width:85px;height:85px;background:#2563eb;color:white;border:none;border-radius:50%;box-shadow:0 0 20px #2563eb;z-index:999;font-size:20px;font-weight:bold}
 #menuBolinha{position:fixed;bottom:220px;right:22px;display:flex;flex-direction:column;gap:12px;z-index:998;display:none}
 .btnMenu{padding:13px;width:150px;border:none;border-radius:10px;font-weight:bold;color:white}
 .btnTravar{background:#1e40af}
 .btnAbrirFF{background:#16a34a}
+
+.oculto{display:none !important}
 </style>
 </head>
 <body>
-<div class="titulo">ALND GERADOR FF</div>
-<div class="caixa">
-  <p style="font-size:16px;margin-bottom:8px;">1. Sistema Operacional</p>
-  <select id="sistema">
-    <option value="Android">Android</option>
-    <option value="iOS">iPhone</option>
-  </select>
-
-  <p style="font-size:16px;margin-bottom:8px;">2. Digite a marca do aparelho</p>
-  <input type="text" id="marcaInput" placeholder="Ex: Samsung, Redmi, Motorola">
-
-  <p style="font-size:16px;margin-bottom:8px;">3. Digite o modelo</p>
-  <input type="text" id="modeloInput" placeholder="Ex: A05s, A15, 18 Pro Max">
-
-  <p style="font-size:16px;margin-bottom:8px;">4. Nível de sensibilidade</p>
-  <select id="nivelSensi">
-    <option value="baixa">Baixa</option>
-    <option value="media">Média</option>
-    <option value="alta">Alta (até 180)</option>
-  </select>
-
-  <button class="botao azul" id="btnGerar">GERAR SENSIBILIDADE</button>
-  <button class="botao azul">GUIA TRAVAR 60FPS</button>
-  <button class="botao azul">OTIMIZAÇÃO GERAL</button>
-  <button class="botao laranja">ATIVAR OTIMIZAÇÃO</button>
-  <button class="botao verde">ABRIR FREE FIRE</button>
-
-  <div id="resultado"></div>
+<!-- Tela de entrada com chave (aparece primeiro) -->
+<div id="telaChave">
+  <div class="caixaChave">
+    <h2 style="margin-bottom:20px;color:#3b82f6">🔑 Digite sua chave de acesso</h2>
+    <input type="text" id="inputChave" placeholder="Cole sua chave aqui">
+    <button class="botao azul" onclick="validarChave()">ENTRAR</button>
+    <p id="avisoChave" style="margin-top:12px;color:#ef4444"></p>
+  </div>
 </div>
 
-<!-- Bolinha e botões -->
-<button id="bolinhaFF">FF</button>
-<div id="menuBolinha">
-  <button class="btnMenu btnTravar" id="btnTravar">TRAVAR BOTÃO</button>
-  <button class="btnMenu btnAbrirFF" id="btnAbrirFF">ABRIR FS DIRETO</button>
+<!-- Conteúdo principal: apenas o gerador de sensibilidade -->
+<div id="conteudoPrincipal" class="oculto">
+  <div class="titulo">ALND GERADOR FF</div>
+  <div class="caixa">
+    <p style="font-size:16px;margin-bottom:8px;">1. Sistema Operacional</p>
+    <select id="sistema">
+      <option value="Android">Android</option>
+      <option value="iOS">iPhone</option>
+    </select>
+
+    <p style="font-size:16px;margin-bottom:8px;">2. Digite a marca do aparelho</p>
+    <input type="text" id="marcaInput" placeholder="Ex: Samsung, Redmi, Motorola">
+
+    <p style="font-size:16px;margin-bottom:8px;">3. Digite o modelo</p>
+    <input type="text" id="modeloInput" placeholder="Ex: A05s, A15, 18 Pro Max">
+
+    <p style="font-size:16px;margin-bottom:8px;">4. Nível de sensibilidade</p>
+    <select id="nivelSensi">
+      <option value="baixa">Baixa</option>
+      <option value="media">Média</option>
+      <option value="alta">Alta (até 180)</option>
+    </select>
+
+    <button class="botao azul" id="btnGerar">GERAR SENSIBILIDADE</button>
+    <button class="botao azul">GUIA TRAVAR 60FPS</button>
+    <button class="botao azul">OTIMIZAÇÃO GERAL</button>
+    <button class="botao laranja">ATIVAR OTIMIZAÇÃO</button>
+    <button class="botao verde">ABRIR FREE FIRE</button>
+
+    <div id="resultado"></div>
+  </div>
+
+  <!-- Bolinha e botões flutuantes -->
+  <button id="bolinhaFF">FF</button>
+  <div id="menuBolinha">
+    <button class="btnMenu btnTravar" id="btnTravar">TRAVAR BOTÃO</button>
+    <button class="btnMenu btnAbrirFF" id="btnAbrirFF">ABRIR FS DIRETO</button>
+  </div>
 </div>
 
 <script>
+// Armazena as chaves válidas
+let listaChaves = JSON.parse(localStorage.getItem('chavesValidas')) || [];
+const inputChave = document.getElementById('inputChave');
+const avisoChave = document.getElementById('avisoChave');
+const telaChave = document.getElementById('telaChave');
+const conteudoPrincipal = document.getElementById('conteudoPrincipal');
 const bolinha = document.getElementById('bolinhaFF');
 const menu = document.getElementById('menuBolinha');
 const btnTravar = document.getElementById('btnTravar');
@@ -71,6 +96,37 @@ const btnGerar = document.getElementById('btnGerar');
 const resultado = document.getElementById('resultado');
 let menuAberto = false;
 
+// Função gerar código aleatório para chave
+function gerarCodigo(){
+  const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let codigo = '';
+  for(let i=0; i<12; i++) codigo += caracteres[Math.floor(Math.random()*caracteres.length)];
+  return `ALND-${codigo}`;
+}
+
+// Criar nova chave com prazo (use essa função separadamente, em outro arquivo admin.html)
+function criarChave(dias){
+  const novaChave = gerarCodigo();
+  const dataExpira = Date.now() + (dias * 24 * 60 * 60 * 1000);
+  listaChaves.push({codigo:novaChave, expira:dataExpira});
+  localStorage.setItem('chavesValidas', JSON.stringify(listaChaves));
+  return novaChave;
+}
+
+// Validar chave de acesso
+function validarChave(){
+  const chaveDigitada = inputChave.value.trim();
+  const agora = Date.now();
+  const chaveEncontrada = listaChaves.find(ch => ch.codigo === chaveDigitada && ch.expira > agora);
+  if(chaveEncontrada){
+    telaChave.classList.add('oculto');
+    conteudoPrincipal.classList.remove('oculto');
+  }else{
+    avisoChave.textContent = '❌ Chave inválida ou vencida';
+  }
+}
+
+// Bolinha flutuante
 bolinha.addEventListener('click', () => {
   menuAberto = !menuAberto;
   menu.style.display = menuAberto ? 'flex' : 'none';
